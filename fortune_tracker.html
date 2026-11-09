@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日運勢觀察與靈感羅盤</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-gold: #fbbf24;
+            --accent-purple: #c084fc;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            color: var(--accent-gold);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* 籤詩與評分 */
+        .divination-result {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .fortune-badge {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .poem {
+            font-size: 18px;
+            font-style: italic;
+            color: var(--accent-purple);
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .score-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .score-item .label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .score-item .stars {
+            color: var(--accent-gold);
+            font-size: 16px;
+            margin-top: 4px;
+        }
+
+        /* 幸運指南 */
+        .lucky-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .lucky-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .lucky-card .title {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .lucky-card .val {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-top: 5px;
+        }
+
+        /* 觀察日記 */
+        .journal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .journal-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .journal-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent-gold);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+        }
+
+        .journal-item .date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>✨ 今日運勢觀察儀 ✨</h1>
+            <p>靜心抽取今日靈感籤，記錄生活的軌跡與感受</p>
+        </header>
+
+        <!-- 占卜區域 -->
+        <div class="card">
+            <button id="drawBtn" class="btn">🔮 抽取今日運勢靈感籤</button>
+
+            <div id="result" class="divination-result">
+                <div style="margin-top: 15px;">
+                    <span id="fortuneBadge" class="fortune-badge">大吉</span>
+                </div>
+
+                <div id="poem" class="poem">「春到人間草木知，隨順自然百事宜。」</div>
+
+                <div class="scores-grid">
+                    <div class="score-item">
+                        <div class="label">🌟 整體運勢</div>
+                        <div id="overallScore" class="stars">★★★★★</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="label">💖 愛情靈感</div>
+                        <div id="loveScore" class="stars">★★★★☆</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="label">💼 事業成長</div>
+                        <div id="workScore" class="stars">★★★★★</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="label">💰 財富能量</div>
+                        <div id="wealthScore" class="stars">★★★☆☆</div>
+                    </div>
+                </div>
+
+                <div class="lucky-grid">
+                    <div class="lucky-card">
+                        <div class="title">🎨 幸運色彩</div>
+                        <div id="luckyColor" class="val">曜石黑</div>
+                    </div>
+                    <div class="lucky-card">
+                        <div class="title">🔢 幸運數字</div>
+                        <div id="luckyNum" class="val">7</div>
+                    </div>
+                    <div class="lucky-card">
+                        <div class="title">🧭 幸運方位</div>
+                        <div id="luckyDir" class="val">正東方</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 運勢日誌紀錄 -->
+        <div class="card">
+            <h3 style="font-size: 18px; color: var(--accent-gold);">📝 運勢觀察日誌</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">記錄今天驗證的運勢感受或想法</p>
+            
+            <div class="journal-form">
+                <textarea id="journalInput" placeholder="寫下你今天的特別經歷或心得..."></textarea>
+                <button id="saveJournalBtn" class="btn" style="background: linear-gradient(135deg, #10b981, #059669);">儲存今日日記</button>
+            </div>
+
+            <div id="journalList" class="journal-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const fortunes = [
+            { level: '大吉', poem: '「春風化雨百花開，心有靈犀大業來。」', scores: [5, 5, 4, 5] },
+            { level: '中吉', poem: '「穩步向前莫急躁，水到渠成自有時。」', scores: [4, 4, 4, 3] },
+            { level: '小吉', poem: '「微風拂面心神定，適合沉澱思未來。」', scores: [3, 4, 3, 4] },
+            { level: '平吉', poem: '「順其自然心坦蕩，無風無浪即是福。」', scores: [3, 3, 3, 3] },
+            { level: '開運', poem: '「破繭而出需勇氣，突破現狀迎新機。」', scores: [4, 3, 5, 4] }
+        ];
+
+        const colors = ['翡翠綠', '天空藍', '琥珀黃', '玫瑰粉', '曜石黑', '薰衣紫'];
+        const directions = ['東方', '南方', '西方', '北方', '東北方', '西南方'];
+
+        const drawBtn = document.getElementById('drawBtn');
+        const resultEl = document.getElementById('result');
+        const fortuneBadge = document.getElementById('fortuneBadge');
+        const poemEl = document.getElementById('poem');
+        const overallScore = document.getElementById('overallScore');
+        const loveScore = document.getElementById('loveScore');
+        const workScore = document.getElementById('workScore');
+        const wealthScore = document.getElementById('wealthScore');
+        const luckyColor = document.getElementById('luckyColor');
+        const luckyNum = document.getElementById('luckyNum');
+        const luckyDir = document.getElementById('luckyDir');
+
+        const journalInput = document.getElementById('journalInput');
+        const saveJournalBtn = document.getElementById('saveJournalBtn');
+        const journalList = document.getElementById('journalList');
+
+        function renderStars(num) {
+            return '★'.repeat(num) + '☆'.repeat(5 - num);
+        }
+
+        drawBtn.addEventListener('click', () => {
+            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomDir = directions[Math.floor(Math.random() * directions.length)];
+            const randomNum = Math.floor(Math.random() * 9) + 1;
+
+            fortuneBadge.textContent = randomFortune.level;
+            poemEl.textContent = randomFortune.poem;
+            overallScore.textContent = renderStars(randomFortune.scores[0]);
+            loveScore.textContent = renderStars(randomFortune.scores[1]);
+            workScore.textContent = renderStars(randomFortune.scores[2]);
+            wealthScore.textContent = renderStars(randomFortune.scores[3]);
+
+            luckyColor.textContent = randomColor;
+            luckyNum.textContent = randomNum;
+            luckyDir.textContent = randomDir;
+
+            resultEl.style.display = 'block';
+            drawBtn.textContent = '🔄 重新搖籤';
+        });
+
+        // 日誌紀錄功能
+        function loadJournals() {
+            const records = JSON.parse(localStorage.getItem('fortune_journals') || '[]');
+            journalList.innerHTML = '';
+            records.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'journal-item';
+                div.innerHTML = `<div class="date">${item.date}</div><div>${escapeHtml(item.text)}</div>`;
+                journalList.appendChild(div);
+            });
+        }
+
+        saveJournalBtn.addEventListener('click', () => {
+            const text = journalInput.value.trim();
+            if (!text) return;
+
+            const records = JSON.parse(localStorage.getItem('fortune_journals') || '[]');
+            const newRecord = {
+                date: new Date().toLocaleString('zh-TW', { dateStyle: 'short', timeStyle: 'short' }),
+                text: text
+            };
+
+            records.unshift(newRecord);
+            localStorage.setItem('fortune_journals', JSON.stringify(records));
+            journalInput.value = '';
+            loadJournals();
+        });
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        loadJournals();
+    </script>
+</body>
+</html>
